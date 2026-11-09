@@ -1,0 +1,26 @@
+# Service — a stable internal address for your pods.
+#
+# Pods come and go (restarts, scaling, deploys), and each gets a new IP.
+# The Service gives you one fixed name (url-shortener) and one fixed IP that
+# always routes to whichever pods are healthy and ready.
+#
+# ClusterIP (the default) means it's only reachable inside the cluster.
+# External access comes later via an Ingress (step 2c).
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: url-shortener
+  labels:
+    app: url-shortener
+spec:
+  type: ClusterIP
+  selector:
+    # "Which pods does this Service route to?" — same label the Deployment
+    # puts on every pod. Same idea as the ALB target group, but using labels
+    # instead of instance registration.
+    app: url-shortener
+  ports:
+    - port: 80            # what you call from inside the cluster
+      targetPort: 3000    # what the container listens on
+      protocol: TCP

@@ -1,0 +1,31 @@
+# Ingress — "create an ALB and route HTTP traffic into the cluster."
+#
+# The AWS Load Balancer Controller watches for Ingress objects with
+# kubernetes.io/ingress.class: alb. When it sees one, it creates a real
+# AWS ALB, target group, and listener — the same resources Phase 1 created
+# in Terraform, but managed by the controller instead.
+#
+# internet-facing: ALB in public subnets, reachable from the internet.
+# ip target type: routes directly to pod IPs (faster, skips NodePort hop).
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: url-shortener
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /readyz
+    alb.ingress.kubernetes.io/target-group-attributes: deregistration_delay.timeout_seconds=30
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: url-shortener
+                port:
+                  number: 80

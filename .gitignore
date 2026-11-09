@@ -1,0 +1,8 @@
+# Terraform working dir and plan files
+.terraform/
+*.tfplan
+
+terraform.tfvars
+
+*.tfstate
+*.tfstate.*
